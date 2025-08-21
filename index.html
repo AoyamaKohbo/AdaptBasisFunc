@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="ja">
+
+  <head>
+    <script type="text/x-mathjax-config">
+
+       MathJax.Hub.Config({TeX:{equationNumbers:{autoNumber:"AMS"}}});
+
+    </script>
+
+    <script type="text/javascript" async 
+
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+
+    </script>
+
+  </head>
+
+  <body>
+    <h3>モデル規範適応制御への有限要素近似の適用</h3>
+    <p>ここでは<a href="https://aoyamakohbo.github.io/AdaptCont/">モデル規範適応制御</a>において、
+      不確定性\(\eta\)が変位\(x\)に依存して変化する問題に対して<a href="https://aoyamakohbo.github.io/BasisFuncApprox/">有限要素近似</a>
+      を適用します。</p>
+    <p><a href="https://aoyamakohbo.github.io/AdaptCont/">モデル規範適応制御</a>では運動制御システムは次式となります。</p>
+    \begin{align}
+     \ddot x  &=~ \eta v,    \label{eq:PosSys}\\
+      v&=~ - a\frac{\eta}{\hat\eta}\dot x - b\frac{\eta}{\hat\eta}(x - u). \label{eq:DrvFrc}
+    \end{align}
+    
+    <p>運動システム\(\eqref{eq:PosSys}\)に比例微分フィードバック\(\eqref{eq:DrvFrc}\)を代入して次式の運動制御システムが得られます。</p>
+    \begin{align}
+    \ddot x + a\frac{\eta}{\hat\eta}\dot x + b\frac{\eta}{\hat\eta}(x - u) = 0 \label{eq:SysEqn2}
+    \end{align}
+
+    <p>不確定性\(\eta\)が変位\(x\)に依存して変化するので、
+      \(\eta\)を\(\eta(x)\)として、
+      <a href="https://aoyamakohbo.github.io/BasisFuncApprox/">有限要素近似</a>により\(\eta(x)\)を次式で与えます。</p>
+    \begin{align}
+      \eta(x) = \sum_{i=1}^n  w_i\phi_i(x) \label{eq:ApproXFunc}
+    \end{align}
+    <p>有限要素の節点\(p_i\)では\(w_i=\eta(p_i)\)となります。</p>
+
+    <p>運動制御システム\eqref{eq:SysEqn2}の目標性能を実現する規範モデルを次式とします。</p> 
+    \begin{align}
+    \ddot x_M + a\dot x_M + b(x_M - u)= 0 \label{eq:MdlEqn}
+    \end{align}
+    <p>ここに、\(x_M\)は規範モデルの変位です。</p>
+
+    <p>運動制御システム\eqref{eq:SysEqn2}において\(\hat\eta=\eta\)であれば運動制御システム\eqref{eq:SysEqn2}は規範モデル\eqref{eq:MdlEqn}と一致します。
+      すなわち、不確定性\(\eta\)は推定値\(\hat\eta\)に相殺されて運動制御システムは目的とする制御性能を実現できます。
+      式\eqref{eq:SysEqn2}を次式のように変形します。</p> 
+    \begin{align}
+      \ddot x + a \dot x + b (x - u) = (1- \frac{\eta(x)}{\hat\eta(x)})\{a \dot x + b (x - u) \} \label{eq:SysEqn3}
+    \end{align}
+
+     <p>式\eqref{eq:MdlEqn}の両辺から式\eqref{eq:SysEqn3}の両辺をそれぞれ引き、比例微分フードバック\eqref{eq:DrvFrc}を考慮すると次式を得ます。 </p> 
+    \begin{align*}
+    (\ddot x_M - \ddot x) + a(\dot x_M - \dot x)  + b(x_M - x) = (\hat\eta(x) -\eta(x))v
+    \end{align*}
+
+     <p> ここで、\(e = x_M - x\)、\(\tilde \eta(x) = \hat\eta(x) - \eta(x)\)とおくと次式が得られます。 </p> 
+
+    \begin{align}
+    \ddot e + a e + b e = \tilde\eta(x) v \label{eq:ErrEqn}
+    \end{align}
+
+     <p><a href="https://aoyamakohbo.github.io/HypStb/">Popovの超安定論</a>を適用するために線形定常ブロックの出力\(\varepsilon\)と非線形時変ブロック\(w\)とを次式で与えます。 </p> 
+
+    \begin{align}
+    \varepsilon = e + c\dot e,~~~w = -\tilde\eta(x) v. \label{eq:ExdEqn}
+    \end{align}
+
+    式\eqref{eq:ErrEqn}と\eqref{eq:ExdEqn} から線形前向きブロックの入力\(-w\)と出力\(\varepsilon\)の関係式は次式となります。
+    \begin{align}
+    \ddot e + a e + b e = -w,~~~\varepsilon = e + c\dot e.  \label{eq:ErrEqn2}
+    \end{align}
+
+    <p> すると、Popov積分は次式となります。 </p> 
+
+   \begin{align}
+   \int_{0}^{t}w\varepsilon dt= -\int_{0}^{t}\tilde\eta(x) v\varepsilon dt= -\int_{0}^{t}\sum_{i=1}^m\tilde w_i\phi_i(x) v\varepsilon dt = -\sum_{i=1}^m\int_{0}^{t} \tilde w_i\phi_i(x) v\varepsilon dt \label{eq:IntgEqn}
+   \end{align}
+   
+    <p>ここで、\(\dot{\tilde w}_i\)に対して次式を与えます。 </p> 
+   
+   \begin{align}
+   \dot{\tilde w}_i = -\alpha v\varepsilon\phi_i(x) \label{eq:AdptRule}
+   \end{align}
+   
+    <p> ここに、\(\alpha\)は定数です。 式\eqref{eq:IntgEqn}に式\eqref{eq:AdptRule}を代入すると次式が得られます。 </p> 
+   \begin{align*}
+   \int_{0}^{t}w\varepsilon dt= \sum_{i=1}^m\int_{0}^{t}\frac{1}{\alpha}\dot{\tilde w}_i(x)\eta dt = \sum_{i=1}^m[\frac{1}{2\alpha}\tilde w_i^2 ]_0^t = \sum_{i=1}^m\frac{1}{2\alpha}\{\tilde w_i(t)^2 - \tilde w_i(0)^2\} \ge -\sum_{i=1}^m\frac{1}{2\alpha}\tilde w_i(0)^2
+   \end{align*}
+
+   <p> これで式\eqref{eq:AdptRule}によりPopovの積分不等式が成立することが確認できます。
+    \(w_i\)は定数なので、\(\dot{\tilde w}_i = \dot{\hat w}_i\)となることに注意すれば\(\hat w\)を次式で
+    調整することによりPopovの積分不等式が満足されます。
+  </p> 
+  
+  \begin{align}
+   \dot{\hat{w}_i} = -\alpha v\varepsilon\phi_i(x) \label{eq:AdptRule2}
+  \end{align}
+
+  <p>次に強正実条件を確認します。式\eqref{eq:ErrEqn2}の前向き線形ブロックの伝達関数\(G(s)=\varepsilon(s)/r(s)\)は次式となります。</p>
+  \begin{align}
+   G(s) = \frac{1+cs}{s^2+as+b} \label{eq:TransFanc}
+  \end{align}
+ 
+  <p>式\eqref{eq:TransFanc}の\(s\)に実数を代入すると\(G(s)\)も実数になり、
+    s面の右半平面\(Re[s]\ge0\)に\(G(s)\)の極(分母：\(s^2+as+b=0\)の解)がないので、
+    強正実条件(1)と(2)は確認できます。次に強正実条件(3)を確認します。
+    式\eqref{eq:TransFanc}の\(s\)に\(j\omega\)を代入すると次式が得られます。
+  </p>
+ 
+  \begin{align}
+   Re[G(j\omega)] = Re[\frac{1+jc\omega}{-\omega^2 +ja\omega + b}] = Re[\frac{1+jc\omega}{b-\omega^2 +ja\omega}]\label{eq:RealPart}
+  \end{align}
+
+<p>分母を有利化すると式\eqref{eq:RealPart}は次式になります。</p>
+
+  \begin{align*}
+   Re[G(j\omega)] &= Re[\frac{(1+jc\omega)(b-\omega^2 - ja\omega)}{(b -\omega^2)^2 + a^2\omega^2}]\\
+   &= Re[\frac{(b-\omega^2+ac\omega^2)+j\{c\omega(b-\omega^2)-a\omega\}}{(b -\omega^2)^2 + a^2\omega^2}]\\
+   &= \frac{b+(ac-1)\omega^2}{(b -\omega^2)^2 + a^2\omega^2} \label{eq:RealPart2}
+   \end{align*}
+
+  <p>分子の中の\(ac-1>0\)、すなわち\(c>1/a\)であれば、\(Re[G(j\omega)]>0\)となり、強正実条件(3)が満足されます。</p>
+
+  <p>運動制御システム\eqref{eq:SysEqn2}を規範モデル\eqref{eq:MdlEqn}に適応させる適応制御則と強正実条件を以下にまとめます。</p>
+  <p>適応制御則：</p>
+  \begin{align*}
+    \dot{\hat{w}_i} &=~ -\alpha v\varepsilon\phi_i(x),\\
+    v&=~ - \frac{1}{\hat\eta}\{a\dot x + b(x - u)\},\\
+    \varepsilon &=~ e + c\dot e,\\
+    e &=~ x_M -x. 
+  \end{align*}
+
+  <p>強誠実条件：</p>
+  \begin{align*}
+   c > \frac{1}{a} \label{eq:STR_Cond}
+  \end{align*}
+
+  <p><a href="https://aoyamakohbo.github.io/AdaptContVib1D/">モデル規範適応制御の数値解析(数値実験)</a>
+    では数値シミュレーションでモデル規範適応制御の動作を確認します。
+ </p>
+
+   <p><a href="https://aoyamakohbo.github.io/Craftlogy/">->TOP</a></p>
+</body>
+
+</html>
