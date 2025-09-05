@@ -25,7 +25,7 @@
     <p><a href="https://aoyamakohbo.github.io/AdaptCont/">モデル規範適応制御</a>では運動制御システムは次式となります。</p>
     \begin{align}
      \ddot x  &=~ \eta v,    \label{eq:PosSys}\\
-      v&=~ - a\frac{\eta}{\hat\eta}\dot x - b\frac{\eta}{\hat\eta}(x - u). \label{eq:DrvFrc}
+      v&=~ - \frac{a}{\hat\eta}\dot x - \frac{b}{\hat\eta}(x - u). \label{eq:DrvFrc}
     \end{align}
     
     <p>運動システム\(\eqref{eq:PosSys}\)に比例微分フィードバック\(\eqref{eq:DrvFrc}\)を代入して次式の運動制御システムが得られます。</p>
